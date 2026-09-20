@@ -35,6 +35,7 @@
 		unit: Unit;
 		unitLabel: string | null;
 		priceOre: number | null;
+		store: string | null;
 	};
 	type Item = {
 		id: string;
@@ -487,6 +488,7 @@
 					{#if costOf(i) !== null}
 						<span class="cost">· {formatPrice(costOf(i), tag)}</span>
 					{/if}
+					{#if pic?.store}<span class="storechip">{pic.store}</span>{/if}
 				</span>
 				{#if i.note}<span class="muted note">{i.note}</span>{/if}
 			</span>
@@ -646,6 +648,9 @@
 					{:else}
 						<p class="pricetag muted">{t('shop.priceNone')}</p>
 					{/if}
+					{#if editingProduct?.store}
+						<p class="storetag muted">{t('shop.store')}: {editingProduct.store}</p>
+					{/if}
 				</div>
 			</div>
 			<div class="field">
@@ -785,6 +790,16 @@
 	.cost {
 		white-space: nowrap;
 	}
+	.storechip {
+		display: inline-block;
+		margin-left: var(--s-2);
+		padding: 0 var(--s-2);
+		border-radius: 999px;
+		background: var(--surface);
+		border: 1px solid var(--border);
+		font-size: var(--t-1);
+		white-space: nowrap;
+	}
 	.flabel {
 		display: block;
 		font-size: var(--t-3);
@@ -797,6 +812,10 @@
 		display: flex;
 		align-items: center;
 		font-weight: 600;
+	}
+	.storetag {
+		margin: 0;
+		font-size: var(--t-2);
 	}
 	.newlist {
 		flex: none;

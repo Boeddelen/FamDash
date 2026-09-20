@@ -168,6 +168,13 @@ configured — **port 4174** — so `http://localhost:4174` on this Mac. If
   totals only what's **not** yet ticked (a total that included the basket would fall as
   you shop, which is the opposite of what a budget is for). Parsing accepts "19,50" or
   "19.50"; rendering follows the household's locale.
+- **A product's `store` is free text, not a fixed list of chains.** Same register-only
+  editing as unit and price (admin-gated `PATCH`), shown read-only wherever unit and
+  price already show — the item dialog and the tile's chip row. A closed enum of stores
+  would need editing every time the household shopped somewhere new; free text doesn't.
+  Don't conflate this with a shopping *list* (`shopping_lists`) — a list groups items for
+  browsing ("Frukt og grønt"), `store` records where to actually buy one. The confusion
+  between the two is exactly what prompted adding `store` as its own field.
 - **A product photo is a cut-out, made in the browser** (`CutoutEditor.svelte`). Picking
   a photo opens it automatically — asked for as a separate step afterwards, background
   removal is a step nobody takes. It crops (the same pan/zoom gesture as every other

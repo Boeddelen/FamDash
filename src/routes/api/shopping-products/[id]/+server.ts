@@ -21,6 +21,7 @@ const schema = z.object({
 	unit: z.enum(UNITS).optional(),
 	unitLabel: z.string().trim().max(24).nullable().optional(),
 	priceOre: z.number().int().min(0).max(10_000_000).nullable().optional(),
+	store: z.string().trim().max(60).nullable().optional(),
 	imageFit: z.enum(IMAGE_FITS).optional(),
 	imageX: z.number().int().min(0).max(100).optional(),
 	imageY: z.number().int().min(0).max(100).optional(),

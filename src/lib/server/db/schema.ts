@@ -186,6 +186,10 @@ export const shoppingProducts = sqliteTable(
 		unitLabel: text('unit_label'),
 		/** Whole øre, never kroner in a float — see $lib/units.ts. */
 		priceOre: integer('price_ore'),
+		/** Free text ("Coop Obs!", "Rema 1000") rather than a fixed list of chains — a
+		 *  household shops at whatever's nearby, and a closed enum would need editing
+		 *  every time a new store came up. Register master data, same as unit and price. */
+		store: text('store'),
 		imagePath: text('image_path'),
 		/** `contain` by default, not `cover`: a product picture is a cut-out on a
 		 *  transparent background, and cropping one to fill a square would slice the

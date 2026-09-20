@@ -1164,12 +1164,22 @@ test('the register: everyone can read it, only an admin can set a unit and a pri
 	await expect(dlg).toBeHidden();
 
 	await row.getByRole('button', { name: 'Edit' }).click();
+	// A raw i18n key with no translation renders as its own literal name — this field
+	// was "shop.category" on screen for a while after the key was renamed to
+	// "shop.list" everywhere except here.
+	await expect(row.getByText('shop.category')).toHaveCount(0);
 	await row.getByLabel('Unit', { exact: true }).selectOption('kg');
 	// Typed with a comma, as a Norwegian would; parsePrice() takes either separator.
 	await row.getByLabel(/^Price per/).fill('24,90');
+	await row.getByLabel('Store').fill('Coop Obs!');
+	// The list picker in this same form is a genuinely different field from Store —
+	// this is the exact confusion the feature request grew out of, so both must be
+	// visible and distinct rather than one silently standing in for the other.
+	await expect(row.getByLabel('List')).toBeVisible();
 	await row.getByRole('button', { name: 'Save' }).click();
 	// Rendered in the household's locale, which this test set to English.
 	await expect(row).toContainText('24.90/kg');
+	await expect(row).toContainText('Coop Obs!');
 
 	// The price reaches the list as amount × price. The unit on a *line* is its own —
 	// changing the register doesn't rewrite rows already on the list — so set it here.
@@ -1184,6 +1194,7 @@ test('the register: everyone can read it, only an admin can set a unit and a pri
 	// 2 kg at 24.90/kg, and the header totals what's still to buy.
 	await expect(tile).toContainText('2 kg');
 	await expect(tile).toContainText('49.80');
+	await expect(tile).toContainText('Coop Obs!');
 	await expect(page.locator('.total')).toContainText('Still to buy');
 
 	// "Other" is a unit in its own right, with the household's own word stored on it.

@@ -15,6 +15,7 @@
 		unit: Unit;
 		unitLabel: string | null;
 		priceOre: number | null;
+		store: string | null;
 		timesUsed: number;
 	};
 
@@ -38,7 +39,14 @@
 	 *  open rather than bound to `data` — otherwise a reload mid-edit would overwrite
 	 *  what's being typed. */
 	let editing = $state<string | null>(null);
-	let buf = $state({ name: '', unit: 'stk' as Unit, unitLabel: '', price: '', listId: null as string | null });
+	let buf = $state({
+		name: '',
+		unit: 'stk' as Unit,
+		unitLabel: '',
+		price: '',
+		store: '',
+		listId: null as string | null
+	});
 
 	function open(p: Product) {
 		editing = p.id;
@@ -47,6 +55,7 @@
 			unit: p.unit,
 			unitLabel: p.unitLabel ?? '',
 			price: p.priceOre == null ? '' : formatPrice(p.priceOre, tag),
+			store: p.store ?? '',
 			listId: p.listId
 		};
 	}
@@ -61,6 +70,7 @@
 					unit: buf.unit,
 					unitLabel: buf.unit === 'other' ? buf.unitLabel.trim() || null : null,
 					priceOre: parsePrice(buf.price),
+					store: buf.store.trim() || null,
 					listId: buf.listId
 				})
 			});
@@ -114,6 +124,10 @@
 								<input id="rp-{p.id}" inputmode="decimal" bind:value={buf.price} />
 							</div>
 						</div>
+						<div class="field">
+							<label for="rs-{p.id}">{t('shop.store')}</label>
+							<input id="rs-{p.id}" placeholder={t('shop.storeHint')} bind:value={buf.store} />
+						</div>
 						{#if buf.unit === 'other'}
 							<div class="field">
 								<label for="rul-{p.id}">{t('shop.unitOwn')}</label>
@@ -121,7 +135,7 @@
 							</div>
 						{/if}
 						<div class="field">
-							<label for="rc-{p.id}">{t('shop.category')}</label>
+							<label for="rc-{p.id}">{t('shop.list')}</label>
 							<select id="rc-{p.id}" bind:value={buf.listId}>
 								<option value={null}>{t('shop.uncategorised')}</option>
 								{#each lists as c (c.id)}<option value={c.id}>{c.name}</option>{/each}
@@ -138,6 +152,7 @@
 						<span class="muted meta">
 							{unitText(p.unit, p.unitLabel)}
 							{#if p.priceOre != null}· {formatPrice(p.priceOre, tag)}/{unitText(p.unit, p.unitLabel)}{/if}
+							{#if p.store}· {p.store}{/if}
 							· {p.timesUsed > 0 ? t('reg.used', { n: p.timesUsed }) : t('reg.never')}
 						</span>
 					</div>
