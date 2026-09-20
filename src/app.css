@@ -1,0 +1,425 @@
+:root {
+	--bg: #f4f5f7;
+	--surface: #ffffff;
+	--surface-2: #eef0f4;
+	--border: #d9dce3;
+	--text: #1c1f26;
+	--text-dim: #5b6472;
+	--primary: #4f46e5;
+	--primary-ink: #ffffff;
+	--danger: #dc2626;
+	--ok: #16a34a;
+	--warn: #d97706;
+	--radius: 14px;
+	--shadow: 0 1px 3px rgba(20, 23, 33, 0.08), 0 8px 24px rgba(20, 23, 33, 0.06);
+	--font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+	color-scheme: light dark;
+
+	/* ---- Spacing scale ------------------------------------------------------
+	   Seven steps, and every gap, padding and margin in the app is one of them.
+	   Each step is *fluid*: it hits its minimum at 360px (the small phone we test)
+	   and its maximum at 1024px (tablet landscape, the wall tablet), interpolating
+	   in between. That is the whole point — a fixed `rem` gives a phone and a
+	   tablet byte-identical spacing, which means one of the two is always wrong:
+	   padding that's comfortable on the tablet steals a tenth of a 360px phone's
+	   width, and padding that's right on the phone leaves the tablet looking like
+	   a stretched phone. One token, both devices, and no per-component breakpoint
+	   to keep in sync.
+
+	   Steps are ~1.4x apart, so neighbours are visibly different and there's no
+	   temptation to invent a value in between. If a design needs something that
+	   isn't on the scale, the scale is wrong — fix it here, not locally. */
+	--s-1: clamp(0.15rem, 0.096rem + 0.24vw, 0.25rem); /* hairline: chip innards */
+	--s-2: clamp(0.3rem, 0.219rem + 0.36vw, 0.45rem); /* tight: icon-to-label */
+	--s-3: clamp(0.45rem, 0.342rem + 0.48vw, 0.65rem); /* default: list rows */
+	--s-4: clamp(0.6rem, 0.464rem + 0.6vw, 0.85rem); /* comfortable: control rows */
+	--s-5: clamp(0.8rem, 0.61rem + 0.84vw, 1.15rem); /* card padding */
+	--s-6: clamp(1rem, 0.729rem + 1.2vw, 1.5rem); /* between cards */
+	--s-7: clamp(1.5rem, 1.12rem + 1.69vw, 2.2rem); /* between page sections */
+
+	/* The page gutter is its own token rather than a step on the scale: it's the one
+	   measurement that trades directly against content width, so on a 360px phone it
+	   stays at 12px (every pixel it gives up is a pixel a chore title gets) and opens
+	   to 24px on the tablet, where the constraint is the opposite — content needs to
+	   stop short of the bezel to read from across the room. */
+	--gutter: clamp(0.75rem, 0.343rem + 1.81vw, 1.5rem);
+
+	/* ---- Type scale ---------------------------------------------------------
+	   Same idea as the spacing scale, same 360px→1024px interpolation, and for a
+	   sharper reason: reading distance. A phone is held at arm's length, the wall
+	   tablet is read from across the kitchen, so the *same* text needs to be
+	   physically bigger there. Fixed sizes can't express that, which is how the app
+	   ended up with twelve different sizes between 10.4px and 15.2px — all of them
+	   unreadable on the tablet and none of them growing.
+
+	   The heading ramp is one step per level (--t-7 h1 … --t-4 h4), so hierarchy is
+	   positional rather than a set of numbers someone has to remember. h4 lands on
+	   body size on purpose: its weight carries the distinction, and a fifth distinct
+	   size would be noise. */
+	--t-1: clamp(0.7rem, 0.619rem + 0.36vw, 0.85rem); /* micro: chip counts, timestamps */
+	--t-2: clamp(0.8rem, 0.719rem + 0.36vw, 0.95rem); /* small: pills, captions */
+	--t-3: clamp(0.88rem, 0.788rem + 0.41vw, 1.05rem); /* meta: labels, muted lines */
+	--t-4: clamp(1rem, 0.892rem + 0.48vw, 1.2rem); /* body — and h4 */
+	--t-5: clamp(1.15rem, 0.987rem + 0.72vw, 1.45rem); /* h3: the card-heading workhorse */
+	--t-6: clamp(1.35rem, 1.052rem + 1.33vw, 1.9rem); /* h2 */
+	--t-7: clamp(1.6rem, 1.275rem + 1.45vw, 2.2rem); /* h1 */
+	--t-8: clamp(2rem, 1.241rem + 3.37vw, 3.4rem); /* display: the clock */
+}
+
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme='light']) {
+		--bg: #12141a;
+		--surface: #1b1e26;
+		--surface-2: #232732;
+		--border: #333846;
+		--text: #eef1f6;
+		--text-dim: #9aa4b2;
+		--primary: #7c7cf9;
+		--shadow: 0 1px 3px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.3);
+	}
+}
+
+:root[data-theme='dark'] {
+	--bg: #12141a;
+	--surface: #1b1e26;
+	--surface-2: #232732;
+	--border: #333846;
+	--text: #eef1f6;
+	--text-dim: #9aa4b2;
+	--primary: #7c7cf9;
+	--shadow: 0 1px 3px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+* {
+	box-sizing: border-box;
+}
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+html {
+	/* Don't let iOS re-scale text when the tablet is rotated. */
+	-webkit-text-size-adjust: 100%;
+}
+body {
+	font-family: var(--font);
+	background: var(--bg);
+	color: var(--text);
+	-webkit-font-smoothing: antialiased;
+	/* Body text is on the scale too, so everything inheriting it (buttons and inputs
+	   take `font: inherit`) grows for the tablet rather than only the headings. At
+	   360px this is 16px — unchanged — so the phone sees no regression, and the
+	   coarse-pointer 16px floor further down still can't be undercut. */
+	font-size: var(--t-4);
+	line-height: 1.5;
+	/* A long unbroken word (a URL, a German-length chore title) must never be able to
+	   widen the page — it wraps instead. */
+	overflow-wrap: break-word;
+}
+
+a {
+	color: var(--primary);
+	text-decoration: none;
+}
+a:hover {
+	text-decoration: underline;
+}
+
+h1,
+h2,
+h3,
+h4 {
+	margin: 0 0 0.4em;
+	line-height: 1.2;
+}
+/* One step per level. h3 and h4 used to have no rule at all, so h3 sat at the browser's
+   flat 1.17em (roughly h2's size on a phone — the ramp was mush) and h4 rendered
+   identically to body text. */
+h1 {
+	font-size: var(--t-7);
+}
+h2 {
+	font-size: var(--t-6);
+}
+h3 {
+	font-size: var(--t-5);
+}
+h4 {
+	font-size: var(--t-4);
+}
+
+button,
+.btn {
+	font: inherit;
+	cursor: pointer;
+	border: 1px solid var(--border);
+	background: var(--surface);
+	color: var(--text);
+	padding: var(--s-4) var(--s-5);
+	border-radius: 10px;
+	min-height: 44px;
+	/* No 300ms tap delay and no double-tap zoom on the wall tablet. */
+	touch-action: manipulation;
+	transition: filter 0.12s ease, background 0.12s ease;
+}
+button:hover,
+.btn:hover {
+	filter: brightness(0.97);
+}
+button:active,
+.btn:active {
+	transform: translateY(1px);
+}
+.btn-primary {
+	background: var(--primary);
+	color: var(--primary-ink);
+	border-color: transparent;
+}
+.btn-danger {
+	background: var(--danger);
+	color: #fff;
+	border-color: transparent;
+}
+.btn-ghost {
+	background: transparent;
+	border-color: transparent;
+}
+/* The admin "add" affordance on a card header: a round, raised + that takes its colour
+   from the card's own --accent, so the rewards one is green, consequences red and bonus
+   purple without three copies of this rule. Icon-only, so the label lives in
+   aria-label/title — keep passing one.
+
+   The + is an <svg> (see .btn-add > svg), not a text "+": a typographic plus sits on
+   the font's math axis, roughly at x-height, so even a perfectly centred text node
+   draws the glyph visibly high — the same trap as centring an emoji's span. Two
+   stroked lines through the middle of a square viewBox are centred geometrically. */
+.btn-add {
+	--_c: var(--accent, var(--primary));
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex: none;
+	width: 40px;
+	height: 40px;
+	min-height: 0;
+	padding: 0;
+	border-radius: 50%;
+	border: 1px solid color-mix(in srgb, #000 22%, var(--_c));
+	color: #fff;
+	/* Lit from above: a lighter crown, the accent through the middle, a darker foot. */
+	background: radial-gradient(
+		120% 130% at 50% 0%,
+		color-mix(in srgb, #fff 34%, var(--_c)) 0%,
+		var(--_c) 52%,
+		color-mix(in srgb, #000 26%, var(--_c)) 100%
+	);
+	box-shadow:
+		inset 0 1px 0 color-mix(in srgb, #fff 55%, transparent),
+		inset 0 -2px 4px color-mix(in srgb, #000 30%, transparent),
+		0 2px 3px rgba(0, 0, 0, 0.4),
+		0 5px 12px color-mix(in srgb, var(--_c) 40%, transparent);
+	transition: filter 0.12s ease, box-shadow 0.12s ease, transform 0.08s ease;
+}
+.btn-add > svg {
+	display: block;
+	width: 56%;
+	height: 56%;
+	filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.35));
+}
+.btn-add:hover {
+	filter: brightness(1.08);
+}
+/* Pressed: the button sinks into its own shadow instead of just nudging down. */
+.btn-add:active {
+	transform: translateY(2px);
+	box-shadow:
+		inset 0 2px 5px color-mix(in srgb, #000 40%, transparent),
+		0 1px 2px rgba(0, 0, 0, 0.35);
+}
+@media (pointer: coarse) {
+	.btn-add {
+		width: 44px;
+		height: 44px;
+	}
+}
+button:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+
+input,
+select,
+textarea {
+	font: inherit;
+	color: var(--text);
+	background: var(--surface);
+	border: 1px solid var(--border);
+	border-radius: 10px;
+	padding: var(--s-4);
+	min-height: 44px;
+	width: 100%;
+}
+textarea {
+	min-height: 80px;
+}
+input[type='color'] {
+	width: 46px;
+	min-height: 40px;
+	padding: 2px;
+	flex: none;
+}
+input[type='checkbox'],
+input[type='radio'] {
+	width: auto;
+	min-height: auto;
+	/* Default is ~13px — far too small to hit reliably on a tablet. */
+	inline-size: 22px;
+	block-size: 22px;
+	accent-color: var(--primary);
+	touch-action: manipulation;
+}
+
+/* Touch devices: anything under 16px makes iOS Safari zoom the page in on focus, so
+   form controls keep a 16px floor no matter what a component asks for. */
+@media (pointer: coarse) {
+	input,
+	select,
+	textarea {
+		font-size: max(16px, 1em);
+	}
+}
+label {
+	display: block;
+	font-size: var(--t-3);
+	color: var(--text-dim);
+	margin-bottom: var(--s-2);
+}
+.field {
+	margin-bottom: var(--s-5);
+}
+
+/* Every page opens the same way: a heading, optional controls beside it, then content.
+   That gap used to be whatever each page happened to declare — nothing at all on /week
+   and /month, --s-5 on /upload, and just the h1's own 0.4em on /tasks and /settings — so
+   flipping between tabs shifted the content up and down. One rule, matching the Today
+   page's hero, which is the one that already looked right. Pair with `.spread` when
+   there are controls to push to the far side. */
+.page-head {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: var(--s-4);
+	margin-bottom: var(--s-5);
+}
+.page-head h1,
+.page-head h2 {
+	margin: 0;
+}
+
+.card {
+	background: var(--surface);
+	border: 1px solid var(--border);
+	border-radius: var(--radius);
+	box-shadow: var(--shadow);
+	padding: var(--s-5);
+}
+
+.muted {
+	color: var(--text-dim);
+}
+.row {
+	display: flex;
+	gap: var(--s-4);
+	align-items: center;
+}
+.row-wrap {
+	flex-wrap: wrap;
+}
+.spread {
+	justify-content: space-between;
+}
+.stack {
+	display: flex;
+	flex-direction: column;
+	gap: var(--s-4);
+}
+.pill {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--s-2);
+	padding: var(--s-1) var(--s-4);
+	border-radius: 999px;
+	background: var(--surface-2);
+	font-size: var(--t-2);
+}
+.error {
+	color: var(--danger);
+	font-size: var(--t-3);
+}
+.grid {
+	display: grid;
+	gap: var(--s-6);
+}
+
+.app-shell {
+	max-width: 1200px;
+	margin: 0 auto;
+	/* viewport-fit=cover means content can slide under a notch / home indicator, so the
+	   side and bottom gutters respect the safe area on iPhones. */
+	padding-block: var(--gutter) max(var(--gutter), env(safe-area-inset-bottom));
+	padding-inline: max(var(--gutter), env(safe-area-inset-left))
+		max(var(--gutter), env(safe-area-inset-right));
+}
+
+/* ---- Dialogs -------------------------------------------------------------
+   One implementation for every modal in the app. `align-items: start` plus
+   `margin-block: auto` on the panel centres it when it fits and lets it scroll
+   from the top when it doesn't — centring alone clips the top of a tall form on
+   a short screen (a phone in landscape), which is unrecoverable for the user. */
+.backdrop {
+	position: fixed;
+	inset: 0;
+	z-index: 200;
+	background: rgba(0, 0, 0, 0.45);
+	display: grid;
+	grid-template-columns: 1fr;
+	justify-items: center;
+	align-items: start;
+	overflow-y: auto;
+	overscroll-behavior: contain;
+	padding: max(var(--gutter), env(safe-area-inset-top)) max(var(--gutter), env(safe-area-inset-right))
+		max(var(--gutter), env(safe-area-inset-bottom)) max(var(--gutter), env(safe-area-inset-left));
+}
+.backdrop > * {
+	margin-block: auto;
+}
+.modal {
+	width: 100%;
+	max-width: 420px;
+}
+
+.toast {
+	position: fixed;
+	bottom: max(20px, env(safe-area-inset-bottom));
+	left: 50%;
+	transform: translateX(-50%);
+	max-width: min(92vw, 460px);
+	background: var(--text);
+	color: var(--bg);
+	padding: var(--s-4) var(--s-6);
+	border-radius: 12px;
+	box-shadow: var(--shadow);
+	z-index: 100;
+}
+
+/** Wrap a table or any wide block that genuinely can't shrink, so it scrolls on its
+    own instead of widening the page. */
+.scroll-x {
+	overflow-x: auto;
+	-webkit-overflow-scrolling: touch;
+}
+
+/* The 640px step that used to shrink .app-shell's gutter is gone — --gutter
+   interpolates across that range instead, so there is no longer a width at which the
+   page visibly jumps. */

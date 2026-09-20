@@ -1,0 +1,37 @@
+node_modules
+
+# Output
+.output
+.vercel
+.netlify
+.wrangler
+/.svelte-kit
+/build
+/build-e2e
+
+# Runtime data (database, secret key, uploads, logs, backups) — this folder IS the backup surface
+/data
+
+# Test artefacts
+/.pw-data
+/.vitest-data
+/tests/screenshots
+/test-results
+/playwright-report
+
+# Notes written against the live household's data — kept local, never committed.
+/suggestions.md
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env
+.env
+.env.*
+!.env.example
+!.env.test
+
+# Vite
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
