@@ -1,18 +1,47 @@
+/* The two faces the theme is built on, self-hosted so the wall tablet never waits on
+   (or needs) the open internet. Both are variable, so one import per family covers
+   every weight the app asks for. */
+@import '@fontsource-variable/newsreader';
+@import '@fontsource-variable/karla';
+
 :root {
-	--bg: #f4f5f7;
-	--surface: #ffffff;
-	--surface-2: #eef0f4;
-	--border: #d9dce3;
-	--text: #1c1f26;
-	--text-dim: #5b6472;
-	--primary: #4f46e5;
-	--primary-ink: #ffffff;
-	--danger: #dc2626;
-	--ok: #16a34a;
-	--warn: #d97706;
-	--radius: 14px;
-	--shadow: 0 1px 3px rgba(20, 23, 33, 0.08), 0 8px 24px rgba(20, 23, 33, 0.06);
-	--font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+	/* ---- Colour: "Lin og leire" (light) / "Bark og glo" (dark) ---------------
+	   Every colour in the app is one of these eleven, and both modes carry the same
+	   eleven names — a component never asks which mode it is in. The neutrals are all
+	   warm (a little red and yellow left in), which is what stops a dark dashboard
+	   looking like a server rack and a light one looking like a spreadsheet.
+	   The four hues are not decoration: clay is "you can act on this", moss is done,
+	   ochre is coming up, and the red is only ever overdue. */
+	--bg: #f0e7da; /* linen */
+	--surface: #fbf6ee;
+	--surface-2: #ede2d3;
+	--border: #e3d5c3;
+	--text: #2a211a;
+	--text-dim: #5e4e41;
+	--primary: #9f4820; /* clay */
+	--primary-ink: #fdf8f1;
+	--danger: #a33529;
+	--ok: #4e6335; /* moss */
+	--warn: #8a5a10; /* ochre */
+	--rain: #3f6a80; /* the one cool colour: chance of precipitation */
+
+	/* A card is a leaf, not a pill: three soft corners and one tight one, always the
+	   bottom left. The parts are separate tokens because a component often needs only the
+	   tight corner or only the soft one; --radius composes them for the common case, which
+	   is why .card still reads `border-radius: var(--radius)`. */
+	--radius-card: 18px;
+	--radius-card-tight: 6px;
+	--radius-inner: 14px; /* a row nested inside a card: one step gentler */
+	--radius-inner-tight: 5px;
+	--radius-control: 10px; /* buttons and inputs stay symmetric — pressing is not a leaf */
+	--radius-pill: 999px;
+	--radius: var(--radius-card) var(--radius-card) var(--radius-card) var(--radius-card-tight);
+	/* A neutral grey shadow on a linen ground reads as dirt; this one is brown. */
+	--shadow: 0 1px 2px rgba(58, 39, 24, 0.07), 0 8px 20px rgba(58, 39, 24, 0.06);
+	--font: 'Karla Variable', Karla, 'Segoe UI', system-ui, sans-serif;
+	/* The display face carries the clock, the temperatures and the card headings —
+	   everything read from across the room. */
+	--font-display: 'Newsreader Variable', Newsreader, Georgia, serif;
 	color-scheme: light dark;
 
 	/* ---- Spacing scale ------------------------------------------------------
@@ -26,23 +55,29 @@
 	   a stretched phone. One token, both devices, and no per-component breakpoint
 	   to keep in sync.
 
-	   Steps are ~1.4x apart, so neighbours are visibly different and there's no
+	   Steps are ~1.3x apart, so neighbours are visibly different and there's no
 	   temptation to invent a value in between. If a design needs something that
-	   isn't on the scale, the scale is wrong — fix it here, not locally. */
+	   isn't on the scale, the scale is wrong — fix it here, not locally.
+
+	   The whole ladder came down about a quarter at the tablet end (s-5 18.4→14.4px,
+	   s-6 24→18.4, s-7 35.2→24) for the warm theme: the dashboard is read from across
+	   the room, and what it was short of was content on screen, not air between it.
+	   The ratios are intact, so hierarchy still reads — there is just less of it. */
 	--s-1: clamp(0.15rem, 0.096rem + 0.24vw, 0.25rem); /* hairline: chip innards */
-	--s-2: clamp(0.3rem, 0.219rem + 0.36vw, 0.45rem); /* tight: icon-to-label */
-	--s-3: clamp(0.45rem, 0.342rem + 0.48vw, 0.65rem); /* default: list rows */
-	--s-4: clamp(0.6rem, 0.464rem + 0.6vw, 0.85rem); /* comfortable: control rows */
-	--s-5: clamp(0.8rem, 0.61rem + 0.84vw, 1.15rem); /* card padding */
-	--s-6: clamp(1rem, 0.729rem + 1.2vw, 1.5rem); /* between cards */
-	--s-7: clamp(1.5rem, 1.12rem + 1.69vw, 2.2rem); /* between page sections */
+	--s-2: clamp(0.28rem, 0.223rem + 0.25vw, 0.4rem); /* tight: icon-to-label */
+	--s-3: clamp(0.4rem, 0.319rem + 0.36vw, 0.55rem); /* default: list rows */
+	--s-4: clamp(0.5rem, 0.392rem + 0.48vw, 0.7rem); /* comfortable: control rows */
+	--s-5: clamp(0.65rem, 0.515rem + 0.6vw, 0.9rem); /* card padding */
+	--s-6: clamp(0.8rem, 0.611rem + 0.84vw, 1.15rem); /* between cards */
+	--s-7: clamp(1.05rem, 0.807rem + 1.08vw, 1.5rem); /* between page sections */
 
 	/* The page gutter is its own token rather than a step on the scale: it's the one
 	   measurement that trades directly against content width, so on a 360px phone it
 	   stays at 12px (every pixel it gives up is a pixel a chore title gets) and opens
-	   to 24px on the tablet, where the constraint is the opposite — content needs to
-	   stop short of the bezel to read from across the room. */
-	--gutter: clamp(0.75rem, 0.343rem + 1.81vw, 1.5rem);
+	   only to 16px on the tablet. It used to reach 24px, which on the wall tablet was a
+	   finger's width of nothing down both edges — the content still stops short of the
+	   bezel at 16px, and the cards get the difference. */
+	--gutter: clamp(0.75rem, 0.614rem + 0.6vw, 1rem);
 
 	/* ---- Type scale ---------------------------------------------------------
 	   Same idea as the spacing scale, same 360px→1024px interpolation, and for a
@@ -68,26 +103,36 @@
 
 @media (prefers-color-scheme: dark) {
 	:root:not([data-theme='light']) {
-		--bg: #12141a;
-		--surface: #1b1e26;
-		--surface-2: #232732;
-		--border: #333846;
-		--text: #eef1f6;
-		--text-dim: #9aa4b2;
-		--primary: #7c7cf9;
-		--shadow: 0 1px 3px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.3);
+		--bg: #16110e; /* bark */
+		--surface: #1f1813;
+		--surface-2: #2a201a;
+		--border: #31261e;
+		--text: #f4eadf;
+		--text-dim: #c6b3a1;
+		--primary: #d97a4e; /* glo */
+		--primary-ink: #16110e;
+		--danger: #da7159;
+		--ok: #8fa86a;
+		--warn: #e9a34b;
+		--rain: #7fa3b5;
+		--shadow: 0 1px 2px rgba(0, 0, 0, 0.45), 0 8px 20px rgba(0, 0, 0, 0.3);
 	}
 }
 
 :root[data-theme='dark'] {
-	--bg: #12141a;
-	--surface: #1b1e26;
-	--surface-2: #232732;
-	--border: #333846;
-	--text: #eef1f6;
-	--text-dim: #9aa4b2;
-	--primary: #7c7cf9;
-	--shadow: 0 1px 3px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.3);
+	--bg: #16110e; /* bark */
+	--surface: #1f1813;
+	--surface-2: #2a201a;
+	--border: #31261e;
+	--text: #f4eadf;
+	--text-dim: #c6b3a1;
+	--primary: #d97a4e; /* glo */
+	--primary-ink: #16110e;
+	--danger: #da7159;
+	--ok: #8fa86a;
+	--warn: #e9a34b;
+	--rain: #7fa3b5;
+	--shadow: 0 1px 2px rgba(0, 0, 0, 0.45), 0 8px 20px rgba(0, 0, 0, 0.3);
 }
 
 * {
@@ -132,6 +177,10 @@ h3,
 h4 {
 	margin: 0 0 0.4em;
 	line-height: 1.2;
+	font-family: var(--font-display);
+	/* The serif carries the hierarchy at 500 — at 700 it turns heavy and starts
+	   competing with the clock, which is the one thing meant to shout. */
+	font-weight: 500;
 }
 /* One step per level. h3 and h4 used to have no rule at all, so h3 sat at the browser's
    flat 1.17em (roughly h2's size on a phone — the ramp was mush) and h4 rendered
@@ -157,7 +206,7 @@ button,
 	background: var(--surface);
 	color: var(--text);
 	padding: var(--s-4) var(--s-5);
-	border-radius: 10px;
+	border-radius: var(--radius-control);
 	min-height: 44px;
 	/* No 300ms tap delay and no double-tap zoom on the wall tablet. */
 	touch-action: manipulation;
@@ -255,7 +304,7 @@ textarea {
 	color: var(--text);
 	background: var(--surface);
 	border: 1px solid var(--border);
-	border-radius: 10px;
+	border-radius: var(--radius-control);
 	padding: var(--s-4);
 	min-height: 44px;
 	width: 100%;
@@ -276,7 +325,7 @@ input[type='radio'] {
 	/* Default is ~13px — far too small to hit reliably on a tablet. */
 	inline-size: 22px;
 	block-size: 22px;
-	accent-color: var(--primary);
+	accent-color: var(--ok);
 	touch-action: manipulation;
 }
 
@@ -349,7 +398,7 @@ label {
 	align-items: center;
 	gap: var(--s-2);
 	padding: var(--s-1) var(--s-4);
-	border-radius: 999px;
+	border-radius: var(--radius-pill);
 	background: var(--surface-2);
 	font-size: var(--t-2);
 }

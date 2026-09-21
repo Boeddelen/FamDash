@@ -164,7 +164,8 @@
 		width: 100%;
 		text-align: left;
 		padding: var(--s-4) var(--s-4);
-		border-radius: 10px;
+		border-radius: var(--radius-inner) var(--radius-inner) var(--radius-inner)
+			var(--radius-inner-tight);
 		border: 2px solid var(--cc-border, var(--border));
 		background: var(--cc-bg, var(--surface));
 		min-height: 52px;
@@ -175,7 +176,7 @@
 	}
 	.chorecard[data-status='todo'] {
 		--cc-border: var(--border);
-		--cc-bg: var(--surface);
+		--cc-bg: var(--surface-2);
 	}
 	.chorecard[data-status='overdue'] {
 		--cc-border: var(--danger);
@@ -231,7 +232,7 @@
 		background: none;
 		padding: var(--s-2) var(--s-3) var(--s-2) var(--s-7);
 		font-size: var(--t-3);
-		border-radius: 8px;
+		border-radius: var(--radius-control);
 		/* Each step is tapped individually by a child — keep it thumb-sized. */
 		min-height: 40px;
 	}
@@ -241,7 +242,7 @@
 		}
 	}
 	.step:hover {
-		background: var(--surface-2);
+		background: var(--surface);
 	}
 	.step.done {
 		color: var(--text-dim);
@@ -253,7 +254,7 @@
 		width: 16px;
 		height: 16px;
 		min-width: 16px;
-		border-radius: 5px;
+		border-radius: var(--radius-inner-tight);
 		border: 2px solid var(--text-dim);
 		font-size: var(--t-1);
 		color: #fff;
@@ -305,8 +306,8 @@
 	.tag,
 	.by,
 	.tagchip {
-		background: var(--surface-2);
-		border-radius: 999px;
+		background: var(--surface);
+		border-radius: var(--radius-pill);
 		padding: 0.05rem var(--s-3);
 	}
 	.tag {

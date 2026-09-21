@@ -49,21 +49,60 @@
 	});
 </script>
 
+<!-- The clock and the weather are the two things read from the doorway, so they share one
+     band across the top rather than sitting in the first column where the weather used to
+     live. Below that, three columns of cards instead of two: the chores get a column to
+     themselves, and nothing that used to need a scroll on the wall tablet does now. -->
 <header class="hero">
-	<div class="time">{clock.toLocaleTimeString(tag, { hour: '2-digit', minute: '2-digit' })}</div>
-	<div class="muted big">
-		{clock.toLocaleDateString(tag, { weekday: 'long', day: 'numeric', month: 'long' })}
+	<div class="card now">
+		<div class="time">{clock.toLocaleTimeString(tag, { hour: '2-digit', minute: '2-digit' })}</div>
+		<div class="muted big">
+			{clock.toLocaleDateString(tag, { weekday: 'long', day: 'numeric', month: 'long' })}
+		</div>
 	</div>
+	<div class="wx"><WeatherCard weather={data.weather} /></div>
 </header>
 
 <div class="dash">
 	<section class="col">
-		<WeatherCard weather={data.weather} />
-
 		<div class="card">
-			<h3>{t('dash.today')}</h3>
+			<div class="row spread chead">
+				<h3>
+					<svg class="cicon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12.5 9 17l10.5-10.5" /></svg>
+					{t('dash.choresToday')}
+				</h3>
+				<span class="pill">{data.todayChores.filter((c) => c.status === 'done').length}/{data.todayChores.length} {t('dash.done')}</span>
+			</div>
+			{#if data.todayChores.length === 0}
+				<p class="muted">{t('chores.nothing')}</p>
+			{:else if allTodayChoresDone}
+				<p class="celebrate">🎉 {t('chores.allDoneToday')} 🎉</p>
+			{/if}
+			{#each choreGroups as [mid, list]}
+				{@const m = members.find((x) => x.id === mid)}
+				<div class="cg">
+					<div class="cghead">
+						{#if m}<Avatar member={m} size={28} />{:else}<span>📋</span>{/if}
+						<span>{m?.name ?? t('chores.anyone')}</span>
+						<span class="twig"></span>
+					</div>
+					{#each list as c (c.id)}<ChoreCard chore={c} today={data.today} />{/each}
+				</div>
+			{/each}
+			<a class="more" href="/tasks">{t('dash.allChores')} →</a>
+		</div>
+	</section>
+
+	<section class="col">
+		<div class="card">
+			<div class="chead">
+				<h3>
+					<svg class="cicon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5.5" width="16" height="15" rx="3" /><path d="M8 3.5v4M16 3.5v4M4 10.5h16" /></svg>
+					{t('dash.today')}
+				</h3>
+			</div>
 			{#if data.todayEvents.length === 0 && data.todayPlans.length === 0}
-				<p class="muted">{t('dash.nothingToday')}</p>
+				<p class="muted empty">{t('dash.nothingToday')}</p>
 			{/if}
 			<ul class="agenda">
 				{#each data.todayEvents as e}
@@ -102,36 +141,14 @@
 			<span class="dl-arrow">→</span>
 		</a>
 
-		<OnThisDayCard items={data.onThisDay} />
-	</section>
-
-	<section class="col">
 		<div class="card">
-			<div class="row spread">
-				<h3>{t('dash.choresToday')}</h3>
-				<span class="pill">{data.todayChores.filter((c) => c.status === 'done').length}/{data.todayChores.length} {t('dash.done')}</span>
+			<div class="chead">
+				<h3>
+					<svg class="cicon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 17.5c3-6 5.5-8.5 8-8.5s4.5 2 8-2.5" /><path d="M16 6h4v4" /></svg>
+					{t('dash.comingUp')}
+				</h3>
 			</div>
-			{#if data.todayChores.length === 0}
-				<p class="muted">{t('chores.nothing')}</p>
-			{:else if allTodayChoresDone}
-				<p class="celebrate">🎉 {t('chores.allDoneToday')} 🎉</p>
-			{/if}
-			{#each choreGroups as [mid, list]}
-				{@const m = members.find((x) => x.id === mid)}
-				<div class="cg">
-					<div class="cghead">
-						{#if m}<Avatar member={m} size={28} />{:else}<span>📋</span>{/if}
-						<span>{m?.name ?? t('chores.anyone')}</span>
-					</div>
-					{#each list as c (c.id)}<ChoreCard chore={c} today={data.today} />{/each}
-				</div>
-			{/each}
-			<a class="more" href="/tasks">{t('dash.allChores')} →</a>
-		</div>
-
-		<div class="card">
-			<h3>{t('dash.comingUp')}</h3>
-			{#if data.upcoming.length === 0}<p class="muted">{t('dash.nothingWeek')}</p>{/if}
+			{#if data.upcoming.length === 0}<p class="muted empty">{t('dash.nothingWeek')}</p>{/if}
 			<ul class="agenda">
 				{#each data.upcoming as u}
 					<li>
@@ -143,11 +160,18 @@
 			</ul>
 			<a class="more" href="/week">{t('dash.planWeek')} →</a>
 		</div>
+	</section>
 
+	<section class="col">
 		<div class="card">
-			<h3>{t('dash.thisWeek')}</h3>
+			<div class="chead">
+				<h3>
+					<svg class="cicon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20V11M12 20V5M19 20v-6" /></svg>
+					{t('dash.thisWeek')}
+				</h3>
+			</div>
 			{#if data.weekByMember.length === 0}
-				<p class="muted">{t('chores.nothing')}</p>
+				<p class="muted empty">{t('chores.nothing')}</p>
 			{:else}
 				<ul class="weekpoints">
 					{#each data.weekByMember as w (w.member.id)}
@@ -162,24 +186,43 @@
 			{/if}
 			<a class="more" href="/tasks">{t('dash.allChores')} →</a>
 		</div>
+
+		<OnThisDayCard items={data.onThisDay} />
 	</section>
 </div>
 
 <style>
-	/* The date sits beside the clock on the same baseline rather than under it. Stacked,
-	   it cost a line and left the entire right half of the row empty; alongside, it fills
-	   the width the row already occupied. It still wraps under on a very narrow screen. */
+	/* The clock and the weather ride together across the top. They wrap onto separate
+	   rows on a phone, where the clock no longer has width to spare beside anything. */
 	.hero {
 		display: flex;
-		align-items: baseline;
 		flex-wrap: wrap;
-		gap: var(--s-2) var(--s-4);
-		margin-bottom: var(--s-5);
+		gap: var(--s-4);
+		align-items: stretch;
+		margin-bottom: var(--s-4);
+	}
+	.now {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		gap: var(--s-2);
+		flex: 1 1 auto;
+		min-width: 0;
+	}
+	/* The weather takes the rest of the band and is the part allowed to grow; below
+	   ~340px of its own it drops under the clock instead of squeezing the hour strip. */
+	.wx {
+		flex: 999 1 20rem;
+		min-width: 0;
 	}
 	.time {
+		font-family: var(--font-display);
 		font-size: var(--t-8);
-		font-weight: 700;
-		line-height: 1;
+		font-weight: 400;
+		line-height: 0.95;
+		letter-spacing: -0.02em;
+		/* Otherwise every minute change nudges the date line sideways. */
+		font-variant-numeric: tabular-nums;
 	}
 	.big {
 		font-size: var(--t-5);
@@ -187,18 +230,40 @@
 	}
 	.dash {
 		display: grid;
-		/* `min(320px, 100%)` is what keeps this honest: a plain minmax(320px, 1fr) track
-		   refuses to shrink below 320px and pushes the whole page wide on a small phone.
-		   With auto-fit the dashboard goes 2-up on a tablet and 1-up on a phone by itself,
-		   with no breakpoint to keep in sync. */
-		grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
-		gap: var(--s-6);
+		/* `min(300px, 100%)` is what keeps this honest: a plain minmax(300px, 1fr) track
+		   refuses to shrink below 300px and pushes the whole page wide on a small phone.
+		   With auto-fit the dashboard goes 3-up on the wall tablet, 2-up on a small
+		   tablet and 1-up on a phone by itself, with no breakpoint to keep in sync. */
+		grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+		gap: var(--s-4);
 		align-items: start;
 	}
 	.col {
 		display: flex;
 		flex-direction: column;
-		gap: var(--s-6);
+		gap: var(--s-4);
+	}
+	/* A card heading: the leaf icon in the accent, then the title. The icon is inline
+	   SVG taking currentColor rather than an emoji, so it sits on the type's baseline
+	   and matches the stroke weight the rest of the theme uses. */
+	.chead {
+		margin-bottom: var(--s-3);
+	}
+	.chead h3 {
+		display: flex;
+		align-items: center;
+		gap: var(--s-2);
+		margin: 0;
+	}
+	.cicon {
+		width: 1em;
+		height: 1em;
+		flex: none;
+		fill: none;
+		stroke: var(--primary);
+		stroke-width: 1.7;
+		stroke-linecap: round;
+		stroke-linejoin: round;
 	}
 	.agenda {
 		list-style: none;
@@ -212,6 +277,9 @@
 		display: flex;
 		align-items: center;
 		gap: var(--s-3);
+		padding: var(--s-3) var(--s-4);
+		background: var(--surface-2);
+		border-radius: var(--radius-inner) var(--radius-inner) var(--radius-inner) var(--radius-inner-tight);
 	}
 	.agenda li.done .tx {
 		text-decoration: line-through;
@@ -233,10 +301,17 @@
 		white-space: nowrap;
 		flex: none;
 	}
+	/* An empty state is a plain sentence beside a twig, not a boxed-in notice: there is
+	   nothing to act on, so it should take no more weight than the line it occupies. */
+	.empty {
+		margin: 0;
+		padding-left: var(--s-5);
+		border-left: 1px dashed var(--border);
+	}
 	.celebrate {
 		margin: var(--s-1) 0 var(--s-5);
 		padding: var(--s-3) var(--s-4);
-		border-radius: 10px;
+		border-radius: var(--radius-inner) var(--radius-inner) var(--radius-inner) var(--radius-inner-tight);
 		background: color-mix(in srgb, var(--ok) 16%, var(--surface));
 		font-weight: 600;
 		text-align: center;
@@ -268,6 +343,14 @@
 		font-weight: 600;
 		font-size: var(--t-3);
 	}
+	/* The twig: a hairline running from the name to the edge of the card, so one
+	   person's chores are told from the next without a heavy divider. */
+	.twig {
+		flex: 1;
+		height: 1px;
+		background: var(--border);
+		min-width: var(--s-6);
+	}
 	.more {
 		display: inline-flex;
 		align-items: center;
@@ -293,12 +376,16 @@
 		min-width: 0;
 		font-weight: 500;
 	}
+	.weekpoints .muted {
+		font-variant-numeric: tabular-nums;
+	}
 	.weekpoints .pts {
 		background: var(--surface-2);
-		border-radius: 999px;
+		border-radius: var(--radius-pill);
 		padding: var(--s-1) var(--s-3);
 		font-size: var(--t-3);
 		font-weight: 600;
+		font-variant-numeric: tabular-nums;
 	}
 	.doclink {
 		display: flex;
@@ -335,7 +422,4 @@
 		color: var(--text-dim);
 		font-size: var(--t-5);
 	}
-	/* .dash reflows on its own (auto-fit above), and the clock now rides --t-8, which
-	   already interpolates 32px→54px across exactly the range the old 820px step was
-	   approximating — so there's nothing left here to tweak. */
 </style>

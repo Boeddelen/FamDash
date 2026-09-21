@@ -74,6 +74,10 @@
 		display: flex;
 		flex-direction: column;
 		gap: var(--s-4);
+		/* Filling the hero band's height means the card lines up with the clock beside it
+		   rather than floating half a step above the bottom of the row. */
+		height: 100%;
+		box-sizing: border-box;
 	}
 	.now {
 		display: flex;
@@ -98,13 +102,18 @@
 		flex-wrap: wrap;
 	}
 	.temp {
+		/* The serif, like the clock: these are the two figures read from across the room,
+		   and they should look like they belong to the same instrument. */
+		font-family: var(--font-display);
 		font-size: var(--t-7);
-		font-weight: 700;
+		font-weight: 400;
 		line-height: 1.1;
+		font-variant-numeric: tabular-nums;
 	}
 	.hilo {
 		font-size: var(--t-3);
 		white-space: nowrap;
+		font-variant-numeric: tabular-nums;
 	}
 	.hilo .hi {
 		color: var(--text);
@@ -114,25 +123,41 @@
 	.place {
 		font-size: var(--t-2);
 	}
+	/* Each hour is its own tile rather than a run of loose numbers: eight columns of
+	   figures need something to sit in or they read as one paragraph of digits. The row
+	   spreads across whatever width the card has and still scrolls sideways on a phone
+	   too narrow for eight of them. */
 	.strip {
 		display: flex;
-		gap: var(--s-3);
+		gap: var(--s-2);
 		overflow-x: auto;
-		padding-bottom: var(--s-2);
+		scrollbar-width: none;
+	}
+	.strip::-webkit-scrollbar {
+		display: none;
 	}
 	.hour {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
 		gap: var(--s-1);
+		flex: 1 0 auto;
 		min-width: 46px;
+		padding: var(--s-2) var(--s-1);
+		background: var(--surface-2);
+		border-radius: var(--radius-inner) var(--radius-inner) var(--radius-inner)
+			var(--radius-inner-tight);
 		font-size: var(--t-2);
+		font-variant-numeric: tabular-nums;
 	}
 	.hour .e {
 		font-size: var(--t-4);
+		line-height: 1;
 	}
 	.rain {
-		color: var(--primary);
+		/* The one cool colour in the theme, so a chance of rain reads instantly against
+		   a page of warm neutrals. */
+		color: var(--rain);
 		font-size: var(--t-1);
 	}
 </style>

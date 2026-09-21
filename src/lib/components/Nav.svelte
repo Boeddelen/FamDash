@@ -64,12 +64,16 @@
 		border-bottom: 1px solid var(--border);
 		margin-bottom: var(--s-5);
 	}
+	/* The household's name is the one piece of branding the app has, so it gets the
+	   display face rather than the UI one. */
 	.brand {
 		display: inline-flex;
 		align-items: center;
 		min-height: 44px;
-		font-weight: 700;
+		font-family: var(--font-display);
+		font-weight: 500;
 		font-size: var(--t-5);
+		letter-spacing: 0.01em;
 		color: var(--text);
 	}
 	/* Never a second row of links: below the width where they all fit, the strip
@@ -96,14 +100,17 @@
 		align-items: center;
 		min-height: 44px;
 		padding: var(--s-3) var(--s-4);
-		border-radius: 8px;
+		border-radius: var(--radius-pill);
 		color: var(--text-dim);
 		touch-action: manipulation;
 	}
+	/* Fill *and* ink on the current page: from across the kitchen a fill alone is a
+	   smudge and ink alone is invisible, and this is the only wayfinding the app has. */
 	.links a.active,
 	.right a.active {
 		background: var(--surface-2);
-		color: var(--text);
+		color: var(--primary);
+		font-weight: 600;
 		text-decoration: none;
 	}
 	.right {
@@ -123,5 +130,6 @@
 		min-height: 44px;
 		font-size: var(--t-3);
 		white-space: nowrap;
+		border-radius: var(--radius-pill);
 	}
 </style>

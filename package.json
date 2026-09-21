@@ -38,6 +38,8 @@
 	},
 	"description": "Self-hosted family dashboard: planning, chores, calendars, weather, school PDF import",
 	"dependencies": {
+		"@fontsource-variable/karla": "^5.3.0",
+		"@fontsource-variable/newsreader": "^5.3.0",
 		"@sveltejs/adapter-node": "^5.5.7",
 		"argon2": "^0.45.1",
 		"better-sqlite3": "^13.0.3",
